@@ -1,0 +1,43 @@
+#################################
+## Jugar con Script: CORAZONES
+##
+##  BIODATA: De 0 a R ¿Cómo llegamos hasta aquí?
+##  Dra. Camila Neder
+##
+################################
+
+# CORAZONES
+#######################
+### Relleno de puntos
+x=seq(-2,2,0.001)
+y=Re((sqrt(cos(x))*cos(200*x)+sqrt(abs(x))-0.7)*(4-x*x)^0.01)
+plot(x,y, col = "red")
+
+#######################
+### Dos colores
+library("ggplot2")
+heart.up <- function(x) {sqrt(1-(abs(x)-1)^2)} #Upper part of the heart
+heart.dw <- function(x) {acos(1-abs(x))-pi}    #Lower part of the heart
+#Plot of the heart
+ggplot(data.frame(x=c(-2,2)), aes(x)) +
+  stat_function(fun=heart.up, geom="line", aes(colour="heart.up")) +
+  stat_function(fun=heart.dw, geom="line", aes(colour="heart.dw")) +
+  scale_colour_manual("Function", values=c("blue","red"), breaks=c("heart.up","heart.dw"))+
+  labs(x = "", y = "")+
+  theme(legend.position = c(.85, .15))
+
+#######################
+### Mensaje Sorpresa
+sorpresa = function(name){
+  t = seq(0,60,len=100)
+  plot(c(-8,8),c(0,20),type='n',axes=FALSE,xlab='',ylab='')
+  x = -.01*(-t^2+40*t+1200)*sin(pi*t/180)
+  y = .01*(-t^2+40*t+1200)*cos(pi*t/180)
+  lines(x,y, lwd=5, col="blue")
+  lines(-x,y, lwd=5, col= "blue")
+  text(0,10,"A vos:",col='black',cex=1.5)
+  text(0,7,"¡Gracias por estar! No te rindas",col='red',cex=0.8)
+  text(0,4,"Cami",col='red',cex=0.7)
+}
+plot(sorpresa)
+#######################
