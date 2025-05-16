@@ -1,0 +1,83 @@
+#################################
+## Jugar con Script: WORDCLOUD
+##
+##  BIODATA: De 0 a R ¿Cómo llegamos hasta aquí?
+##  Dra. Camila Neder
+##
+################################
+
+#WORDCLOUD para interpretación de palabras repetidas
+install.packages(c("tm", "SnowballC", "wordcloud", "RColorBrewer", "RCurl", "XML","NLP", "bitops"))
+library("tm")
+library("SnowballC")
+library("wordcloud")
+library("RColorBrewer")
+library("RCurl")
+library("XML")
+library("bitops")
+
+filePath <- "C:/R/Scripts R-CN/Download_text.txt"  # Aquí la ruta donde guardas el archivo .txt
+
+# x : cadena de texto (texto plano, URL web, o ruta de archivo)
+# type : especifica si x es texto plano, URL o archivo
+# lang : idioma del texto
+# excludeWords : vector de palabras que se excluirán del texto
+# textStemming : reduce las palabras a su raíz
+# colorPalette : nombre de paleta de colores de RColorBrewer, o un nombre/código de color
+# min.freq : las palabras con frecuencia menor no se mostrarán
+# max.words : número máximo de palabras a mostrar; se eliminan las menos frecuentes
+# valor devuelto por la función: una lista (tdm, tabla de frecuencias)
+
+rquery.wordcloud <- function(x, type=c("text", "url", "file"), 
+                             lang="english", excludeWords=NULL, 
+                             textStemming=FALSE,  colorPalette="Set1",
+                             min.freq=3, max.words=200)
+{ 
+  library("tm")
+  library("SnowballC")
+  library("wordcloud")
+  library("RColorBrewer") 
+  
+  if(type[1] == "file") text <- readLines(x)
+  else if(type[1] == "url") text <- html_to_text(x)
+  else if(type[1] == "text") text <- x
+  
+  # Cargar el texto como un corpus
+  docs <- Corpus(VectorSource(text))
+  # Convertir a minúsculas
+  docs <- tm_map(docs, content_transformer(tolower))
+  # Eliminar números
+  docs <- tm_map(docs, removeNumbers)
+  # Eliminar palabras vacías según el idioma
+  docs <- tm_map(docs, removeWords, stopwords(lang))
+  # Eliminar puntuación
+  docs <- tm_map(docs, removePunctuation)
+  # Eliminar espacios en blanco extras
+  docs <- tm_map(docs, stripWhitespace)
+  # Eliminar palabras específicas definidas por el usuario
+  if(!is.null(excludeWords)) 
+    docs <- tm_map(docs, removeWords, excludeWords) 
+  # Reducir palabras a su raíz (stemming)
+  if(textStemming) docs <- tm_map(docs, stemDocument)
+  # Crear matriz término-documento
+  tdm <- TermDocumentMatrix(docs)
+  m <- as.matrix(tdm)
+  v <- sort(rowSums(m), decreasing = TRUE)
+  d <- data.frame(word = names(v), freq = v)
+  # Verificar la paleta de colores
+  if(!colorPalette %in% rownames(brewer.pal.info)) colors = colorPalette
+  else colors = brewer.pal(8, colorPalette) 
+  # Generar la nube de palabras
+  set.seed(1234)
+  wordcloud(d$word, d$freq, min.freq = min.freq, max.words = max.words,
+            random.order = FALSE, rot.per = 0.35, 
+            use.r.layout = FALSE, colors = colors)
+  
+  invisible(list(tdm = tdm, freqTable = d))
+}
+
+# Ejecutar la función con tus parámetros
+rquery.wordcloud(filePath, type = c("file"), 
+                 lang = "spanish", excludeWords = NULL, 
+                 textStemming = TRUE,  colorPalette = "Dark2", 
+                 min.freq = 1, max.words = 200)
