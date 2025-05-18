@@ -33,11 +33,6 @@ rquery.wordcloud <- function(x, type=c("text", "url", "file"),
                              textStemming=FALSE,  colorPalette="Set1",
                              min.freq=3, max.words=200)
 { 
-  library("tm")
-  library("SnowballC")
-  library("wordcloud")
-  library("RColorBrewer") 
-  
   if(type[1] == "file") text <- readLines(x)
   else if(type[1] == "url") text <- html_to_text(x)
   else if(type[1] == "text") text <- x
