@@ -64,7 +64,9 @@ rquery.wordcloud <- function(x, type=c("text", "url", "file"),
   else colors = brewer.pal(8, colorPalette) 
   # Generar la nube de palabras
   set.seed(1234)
-  wordcloud(d$word, d$freq, min.freq = min.freq, max.words = max.words,
+  wordcloud(d$word, d$freq,
+            scale= c(2, 0.5),
+            min.freq = min.freq, max.words = max.words,
             random.order = FALSE, rot.per = 0.35, 
             use.r.layout = FALSE, colors = colors)
   
